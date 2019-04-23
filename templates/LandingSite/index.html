@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block landing-index %}
+
+<!--Landing Page-->
+<section id="landing-frame" class="d-flex">
+    <div id="landing-bg"></div>
+    <div class="landing-paintTop"></div>
+    <div id="landing-caption">
+        <div class="container-fluid row">
+            <div class="landing-text m-auto">
+                <p class="h4 text-wrap Dark-shades-text">
+                    As a high school student looking to pursue a higher education after your graduation, it may seem
+                    difficult to find and apply to the right university. We aim to solve your problems by bringing a
+                </p>
+            </div>
+            <!-- SignUP/LogIN card -->
+            <div class="card signup-card m-auto">
+                <div class="card-body">
+                    <h6 class="card-title text-center Dark-shades-text">
+                        <span class="h3">
+                            JOIN US TO END YOUR SEARCH!
+                        </span><br>your one stop solution to college searching and application
+                    </h6>
+                    <div class="card-text">
+                        <div class="card" style="border-radius: 10px;">
+                            <div class="card-header">
+                                <ul class="nav nav-tabs card-header-tabs">
+                                    <li class="nav-item">
+                                        <a href="#SignUp-form" class="nav-link active" id="SignUp-Tab" data-toggle="tab"
+                                            role="tab" aria-controls="LogIn" aria-selected="true">
+                                            <h5 class="card-title">Sign Up</h5>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#LogIn-form" class="nav-link" id="LogIn-Tab" data-toggle="tab"
+                                            role="tab" aria-controls="LogIn" aria-selected="false">
+                                            <h5 class="card-title">Log In</h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- sign Up tab -->
+                            <div class="card-body tab-content" id="SignUpLogIn-Content">
+                                <div class="tab-pane fade show active" role="tabpanel" aria-labelledby="SignUp-Tab"
+                                    id="SignUp-form">
+                                    <form action="{% url 'register' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <input type="text" class="form-control" name="firstName"
+                                                    placeholder="First name" required>
+                                            </div>
+                                            <div class="col">
+                                                <input type="text" class="form-control" name="lastName"
+                                                    placeholder="Last name" required>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <input type="text" class="form-control" name="email" placeholder="Email"
+                                                    required>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <input type="text" class="form-control" name="username"
+                                                    placeholder="Username" required>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <input type="password" class="form-control" name="password"
+                                                    placeholder="Password" required>
+                                            </div>
+                                            <div class="col">
+                                                <input type="password" class="form-control" name="password2"
+                                                    placeholder="Confirm Password" required>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div class="form-check form-check-inline">
+                                                &nbsp;&nbsp;
+                                                <input type="radio" name="userType" id="userStudent"
+                                                    class="form-check-input" value="Student" required>
+                                                <label for="Student" class="form-check-label">Student</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                &nbsp;&nbsp;
+                                                <input type="radio" name="userType" id="userUniStaff"
+                                                    class="form-check-input" value="University Staff" required>
+                                                <label for="UniStaff" class="form-check-label">University Staff</label>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div id="UniAccount" style="display:none">
+                                                <div class="col">
+                                                    <select name="UniversitySelect" id="UniversitySelect"
+                                                        class="form-control">
+                                                        {% for uni in uniList %}
+                                                        <option value="{{uni.title}}">{{uni.title}}</option>
+                                                        {%endfor%}
+                                                    </select>
+                                                </div>
+                                                <small class="text-wrap" style="width: 25rem; margin-left: .5rem">** if
+                                                    you can't find your university in the list, please contact system
+                                                    admin</small>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div class="form-check form-check-inline">
+                                                &nbsp;&nbsp;
+                                                <input type="checkbox" class="form-check-input"
+                                                    id="Terms&Conditions-checkbox" required>
+                                                <label for="Terms&Conditions-checkbox" class="form-check-label">
+                                                    I accept the <a href="">Terms and Conditions</a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <button type="submit" class="btn btn-md main-color"
+                                                    style="float: right;">Sign up</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- Log in tab -->
+                                <div class="tab-pane fade" role="tabpanel" aria-labelledby="LogIn-Tab" id="LogIn-form">
+                                    <form action="{% url 'login' %}" method="POST">
+                                        {% csrf_token %}
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <input type="text" class="form-control" name="username"
+                                                    placeholder="Username" required>
+                                            </div>
+                                        </div>
+                                        <br class="form-gap">
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <input type="password" class="form-control" name="password"
+                                                    placeholder="Password" required>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="form-row">
+                                            <div class="col">
+                                                <button type="submit" class="btn btn-md main-color"
+                                                    style="float: right;">Log In</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'partials/_alerts.html' %}
+    </div>
+</section>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="sys_info h-100">
+    <section class="w-100 h-100 container-fluid d-flex" id="sec1">
+        <div class="row w-100 my-auto justify-content-center">
+            <col-5 class="mx-auto">
+                <h3 class="text-center">Features for Students</h3>
+                <hr class="Dark-shades">
+                <ul class="list-unstyled" style="font-size: 1.2rem;">
+                    <li>Single Profile, Multiple Application</li>
+                    <li>Live application progress status display</li>
+                    <li>Changed your mind? -No problem, you can cancel your application</li>
+                </ul>
+            </col-5>
+            <col-5 class="mx-auto">
+                <h3 class="text-center">Features for Universities</h3>
+                <hr class="Dark-shades">
+                <ul class="list-unstyled" style="font-size: 1.2rem;">
+                    <li>Manage all student's Applications from one account</li>
+                    <li>Add new courses to offer in a few seconds</li>
+                    <li>Low fees!!</li>
+                </ul>
+            </col-5>
+        </div>
+    </section>
+
+    <section class="w-100 h-100 container-fluid d-flex justify-content-center bg-secondary text-light" id="sec2">
+        <!-- display Universities -->
+        <div class="container-fluid w-100 d-flex justify-content-center my-auto">
+            {% for university in uniList %}
+            <div class="card bg-dark mx-4 uniCard" style="width: 20rem; height: 25rem;">
+                <img src="{{university.photo_main.url}}" class="card-img-top" alt="{{university.title}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ university.title }}</h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marked-alt"></i> &nbsp; {{ university.city }}, {{ university.state }} <br>
+                        <i class="fas fa-phone"></i> &nbsp; {{ university.phone_number }} <br>
+                        <i class="fas fa-external-link-alt"></i> &nbsp; <a href="{{university.website}}"
+                            target="_blank"> Go
+                            to website </a>
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="w-100 h-100" id="sec3">
+
+        <div class="h-25"></div>
+
+        <h2>Testimonials</h2>
+        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+            <!-- Carousel indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="1"></li>
+                <li data-target="#myCarousel" data-slide-to="2"></li>
+            </ol>
+            <!-- Wrapper for carousel items -->
+            <div class="carousel-inner">
+                <div class="item carousel-item active">
+                    <div class="img-box"><img src="{% static 'img/dummy-profile1.png' %}" alt=""></div>
+                    <p class="testimonial">Phasellus vitae suscipit justo. Mauris pharetra feugiat ante id lacinia.
+                        Etiam faucibus mauris id tempor egestas. Duis luctus turpis at accumsan tincidunt. Phasellus
+                        risus risus, volutpat vel tellus ac, tincidunt fringilla massa. Etiam hendrerit dolor eget
+                        rutrum.</p>
+                    <p class="overview"><b>Michael Holz</b>Seo Analyst at <a href="#">OsCorp Tech.</a></p>
+                    <div class="star-rating">
+                        <ul class="list-inline">
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star-o"></i></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item carousel-item">
+                    <div class="img-box"><img src="{% static 'img/dummy-profile2.jpg' %}" alt=""></div>
+                    <p class="testimonial">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam eu sem tempor,
+                        varius quam at, luctus dui. Mauris magna metus, dapibus nec turpis vel, semper malesuada ante.
+                        Vestibulum idac nisl bibendum scelerisque non non purus. Suspendisse varius nibh non aliquet.
+                    </p>
+                    <p class="overview"><b>Paula Wilson</b>Media Analyst at <a href="#">SkyNet Inc.</a></p>
+                    <div class="star-rating">
+                        <ul class="list-inline">
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star-o"></i></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="item carousel-item">
+                    <div class="img-box"><img src="{% static 'img/dummy-profile3.jpg' %}" alt=""></div>
+                    <p class="testimonial">Vestibulum quis quam ut magna consequat faucibus. Pellentesque eget nisi a mi
+                        suscipit tincidunt. Utmtc tempus dictum risus. Pellentesque viverra sagittis quam at mattis.
+                        Suspendisse potenti. Aliquam sit amet gravida nibh, facilisis gravida odio. Phasellus auctor
+                        velit.</p>
+                    <p class="overview"><b>Antonio Moreno</b>Web Developer at <a href="#">Circle Ltd.</a></p>
+                    <div class="star-rating">
+                        <ul class="list-inline">
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star"></i></li>
+                            <li class="list-inline-item"><i class="fa fa-star-half-o"></i></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Carousel controls -->
+            <a class="carousel-control left carousel-control-prev" href="#myCarousel" data-slide="prev">
+                <i class="fa fa-angle-left"></i>
+            </a>
+            <a class="carousel-control right carousel-control-next" href="#myCarousel" data-slide="next">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

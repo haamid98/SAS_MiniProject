@@ -1,0 +1,349 @@
+{% extends 'Dashboards/Dash_base.html' %}
+{% load static %}
+
+{% block navDash %}
+<li class="nav-item">
+    <a class="nav-link active" id="btnPg1" href="#Pg1">Register University </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" id="btnPg2" href="#Pg2">Add University Staff</a>
+</li>
+<!-- <li class="nav-item">
+    <a class="nav-link" id="btnPg3" href="#Pg3">My Profile</a>
+</li> -->
+{% endblock %}
+
+
+{% block pages %}
+<section id="Pg1" class="Pages AppPages container-fluid d-flex justify-content-start">
+    <!-- display Universities -->
+    <div class="container-fluid d-flex justify-content-start row mt-3">
+        {% for university in universities %}
+        <div class="card mx-4 uniCard" style="width: 20rem; height: 25rem;">
+            <img src="{{university.photo_main.url}}" class="card-img-top" alt="{{university.title}}">
+            <div class="card-body">
+                <h5 class="card-title Dark-shades-text">{{ university.title }}</h5>
+                <p class="card-text">
+                    <i class="fas fa-map-marked-alt"></i> &nbsp; {{ university.city }}, {{ university.state }} <br>
+                    <i class="fas fa-phone"></i> &nbsp; {{ university.phone_number }} <br>
+                    <i class="fas fa-external-link-alt"></i> &nbsp; <a href="{{university.website}}" target="_blank"> Go
+                        to website </a>
+                </p>
+                <!-- Button trigger modal -->
+                <button type="button" id="btn-UniModal{{university.id}}" class="btn btnUni main-color"
+                    data-toggle="modal" data-target="#UniStaffDetails{{university.id}}">
+                    View Details
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <h1 class="display-4">
+            Sorry!
+            <small>No Universities to display</small>
+        </h1>
+        {% endfor %}
+    </div>
+
+    <!-- Modal for University Details -->
+    {%for university in universities%}
+    <div class="modal fade" id="UniStaffDetails{{university.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="UniInformation" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="UniModalTitle">{{university.title}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{university.description}}
+
+                    <!-- Tabs for Faculties -->
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            {% if programs %}
+                            {% regroup  programs|dictsort:"department" by university_id as uniPrograms %}
+                            {% for UniProg in uniPrograms %}
+
+                            {% if UniProg.grouper == university.id %}
+                            {% regroup  UniProg.list by department as Programs %}
+                            {% for Prog in Programs %}
+                            <a class="nav-item nav-link nav-faculty" id="nav-{{ Prog.grouper | slugify }}"
+                                data-toggle="tab" href="#nav{{ Prog.grouper | slugify }}" role="tab"
+                                aria-controls="nav{{ Prog.grouper | slugify }}" aria-selected="false">
+                                {{ Prog.grouper }}
+                            </a>
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        {% if programs %}
+                        {% regroup  programs|dictsort:"department" by university_id as uniPrograms %}
+                        {% for UniProg in uniPrograms %}
+
+                        {% if UniProg.grouper == university.id %}
+                        {% regroup  UniProg.list by department as Programs %}
+                        {% for Prog in Programs %}
+                        <div class="tab-pane fade show" id="nav{{ Prog.grouper | slugify }}" role="tabpanel"
+                            aria-labelledby="nav-{{ Prog.grouper | slugify }}">
+                            <div class="accordion mt-2" id="accordionExample">
+                                {% for program in Prog.list %}
+                                <div class="card">
+                                    <div class="card-header" id="heading{{program.id}}">
+                                        <h2 class="mb-0">
+                                            <button class="btn" type="button" data-toggle="collapse"
+                                                data-target="#collapse{{program.id}}" aria-expanded="false"
+                                                aria-controls="collapse{{program.id}}">
+                                                {{program.title}}
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="collapse{{program.id}}" class="collapse"
+                                        aria-labelledby="heading{{program.id}}" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            Duration: {{program.duration}} <br>
+                                            Campuses: {{program.campus}} <br>
+                                            Level of Study: {{program.level}} <br>
+                                            <div class="mt-4">
+                                                <div class="h5" style="font-weight: 800">&nbsp; About this course</div>
+                                                <p>
+                                                    {{program.description}}
+                                                </p>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="h5" style="font-weight: 800">&nbsp; Entry Requirements</div>
+                                                <p>
+                                                    {{program.requirements}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="addProg{{university.id}}" tabindex="-1" role="dialog"
+                        aria-labelledby="addProg{{university.id}}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addProgLabel">Add a new program</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form action="{% url 'addProg' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="university" value="{{university.title}}">
+                                        <input type="text" name="title" placeholder="Program Title"
+                                            class="form-control">
+                                        <br class="form-gap">
+                                        <input type="text" name="department" placeholder="Department"
+                                            class="form-control">
+                                        <br class="form-gap">
+                                        <input type="text" name="level" placeholder="Level" class="form-control">
+                                        <br class="form-gap">
+                                        <input type="number" min="1" max="10" step="1" name="duration"
+                                            placeholder="Duration" class="form-control">
+                                        <br class="form-gap">
+                                        <input type="text" name="campus" placeholder="Campus" class="form-control">
+                                        <br class="form-gap">
+                                        <textarea type="textare" name="requirements" placeholder="Requirements"
+                                            class="form-control"></textarea>
+                                        <br class="form-gap">
+                                        <textarea row=20 name="description" placeholder="Description"
+                                            class="form-control"></textarea>
+                                        <br class="form-gap">
+                                        <button type="submit" class="btn btn-success float-right">Save</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn main-color" data-toggle="modal"
+                        data-target="#addProg{{university.id}}">
+                        <i class="fas fa-plus"></i> Add Program
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn main-color" id="btnAdd" data-toggle="modal" data-target="#regUni">
+        <i class="fas fa-plus"></i>
+    </button>
+    <!-- Modal -->
+    <div class="modal fade" id="regUni" tabindex="-1" role="dialog" aria-labelledby="regUni" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="regUniLabel">Register University</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'regUni' %}" enctype="multipart/form-data" method="POST" id="regUni">
+                        {% csrf_token %}
+                        <input type="text" name="title" class="form-control" placeholder="University Title" required>
+                        <br class="form-gap">
+                        <input type="text" name="address" class="form-control" placeholder="Address" required>
+                        <br class="form-gap">
+                        <input type="text" name="city" class="form-control" placeholder="City" required>
+                        <br class="form-gap">
+                        <input type="text" name="state" class="form-control" placeholder="State" required>
+                        <br class="form-gap">
+                        <input type="text" name="zipcode" class="form-control" placeholder="Zipcode" required>
+                        <br class="form-gap">
+                        <input type="text" name="phone_number" class="form-control" placeholder="Phone Number" required>
+                        <br class="form-gap">
+                        <input type="text" name="website" class="form-control" placeholder="website" required>
+                        <br class="form-gap">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="photo_main" id="display Image">
+                            <label class="custom-file-label">Upload display Image
+                                <small>(image.'jpg,png,svg,jpeg')</small></label>
+                        </div>
+                        <br class="form-gap">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="photo_logo" id="Logo">
+                            <label class="custom-file-label">Upload Logo
+                                <small>(image.'jpg,png,svg,jpeg')</small></label>
+                        </div>
+                        <br class="form-gap">
+                        <input type="text" name="description" class="form-control" placeholder="Description" required>
+                        <br class="form-gap">
+                        <button class="btn btn-success float-right">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="Pg2" class="Pages AppPages container-fluid d-none justify-content-start">
+    <!-- display Universities -->
+    <div class="container-fluid d-flex justify-content-start row mt-3">
+        {% for university in universities %}
+        <div class="card mx-4 uniCard" style="width: 20rem; height: 40rem;">
+            <img src="{{university.photo_main.url}}" class="card-img-top" alt="{{university.title}}">
+            <div class="card-body" style=" overflow-y: scroll;">
+                <h5 class="card-title Dark-shades-text">{{ university.title }}</h5>
+                <p class="card-text">
+                    <div id="accordion">
+                        {% for staff in staffs %}
+                        {% if staff.university == university.title %}
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn collapsed" data-toggle="collapse"
+                                        data-target="#Staff{{ staff.id }}" aria-expanded="false"
+                                        aria-controls="Staff{{ staff.id }}">
+                                        {{ staff.user.first_name }} {{ staff.user.last_name }}
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="Staff{{ staff.id }}" class="collapse" aria-labelledby="headingOne"
+                                data-parent="#accordion">
+                                <div class="card-body">
+                                    <p>
+                                        <strong>Username: </strong> {{ staff.user.username }} <br>
+                                        <strong>Email: </strong> {{ staff.user.email }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn collapsed" data-toggle="collapse" data-target="#addStaff{{university.id}}"
+                                        aria-expanded="false" aria-controls="addStaff">
+                                        Add New Staff
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="addStaff{{university.id}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                        <form action="{% url 'register' %}" method="POST">
+                                                {% csrf_token %}
+                                                <div class="form-row">
+                                                    <div class="col">
+                                                        <input type="text" class="form-control" name="firstName" placeholder="First name" required>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input type="text" class="form-control" name="lastName" placeholder="Last name" required>
+                                                    </div>
+                                                </div>
+                                                <br class="form-gap">
+                                                <div class="form-row">
+                                                    <div class="col">
+                                                        <input type="text" class="form-control" name="email" placeholder="Email" required>
+                                                    </div>
+                                                </div>
+                                                <br class="form-gap">
+                                                <div class="form-row">
+                                                    <div class="col">
+                                                        <input type="text" class="form-control" name="username" placeholder="Username" required>
+                                                    </div>
+                                                </div>
+                                                <br class="form-gap">
+                                                <div class="form-row">
+                                                    <div class="col">
+                                                        <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                                    </div>
+                                                    <div class="col">
+                                                        <input type="password" class="form-control" name="password2" placeholder="Confirm Password" required>
+                                                    </div>
+                                                </div>
+                                                <br class="form-gap">
+                                                <div class="form-row">
+                                                    <input type="hidden" name="userType" value="University Staff">
+                                                    <input type="hidden" name="university" value="{{university.title}}">
+                                                </div>
+                                                <br class="form-gap">
+                                                <div class="form-row">
+                                                    <div class="col">
+                                                        <button type="submit" class="btn btn-md main-color" style="float: right;">Register Staff</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p>
+            </div>
+        </div>
+        {% empty %}
+        <h1 class="display-4">
+            Sorry!
+            <small>No Universities to display</small>
+        </h1>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!--Custom CSS-->
+    <link rel="stylesheet" href="{% static 'css/style-StudentDash.css' %}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <!--Font Awesome icons-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <!--Google Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Lato|Open+Sans|Source+Sans+Pro|Titillium+Web" rel="stylesheet">
+
+    <title>Dashboard | {{ user.first_name }} {{ user.last_name }}</title>
+</head>
+<body>
+    <div class="row" style="height: 100%">
+        <div class="col-2 pr-0">
+            <nav id="side-nav" class="nav flex-column justify-content-center navbar Dark-shades navbar-dark">
+                {% if userProfile.profilePic %}
+                <img src="{{userProfile.profilePic.url}}" class="profPic">
+                {% else %}
+                <div class="text-center mt-2">
+                    <i class="userIcon Light-shades-text fas fa-user-circle"></i>
+                </div>
+                {% endif %}
+                <ul class="nav navbar-nav Light-shades-text mt-lg-5 mr-lg-auto ml-lg-4" id="side-nav-list">
+                    {% block navDash %}
+
+                    {% endblock %}
+                </ul>
+            </nav>
+        </div>
+        <div class="col-10 pl-0" id="content-main">
+            <nav class="navbar sticky-top navbar-light Light-shades Dark-shades-text d-flex justify-content-end" id="top-nav">
+                <p class="mb-0 mr-1" id="welcomeUser">Welcome to your <strong>{{userProfile.userType | lower}}</strong> dashboard, {{ user.username }}</p>
+                <a class="nav-item nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    <i class="icon Dark-shades-text fas fa-angle-down"></i>
+                </a>
+                <div class="dropdown-menu Light-shades Dark-shades-text" role="menu">
+                    <a href="" class="dropdown-item Dark-shades-text">
+                        <i class="icon Dark-shades-text fas fa-user-edit"></i> Update Profile
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="javascript:{document.getElementById('logout').submit()}" class="dropdown-item Dark-shades-text">
+                        <i class="icon Dark-shades-text fas fa-sign-out-alt"></i> Log Out
+                    </a>
+                    <form action="{% url 'logout' %}" method="POST" id="logout">
+                        {% csrf_token %}
+                        <input type="hidden">
+                    </form>
+                </div>
+            </nav>
+            
+            {% include 'partials/_alerts.html' %}
+
+            {% block pages %}
+
+            {% endblock %}
+
+        </div>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    
+    <!-- Custom Javascript -->
+    <script src="{% static 'js/_alertDisappear.js' %}"></script>
+    <script src="{% static 'js/toggleStuPages.js' %}"></script>
+    <script src="{% static 'js/_uploadName.js' %}"></script>
+</body>
+</html>

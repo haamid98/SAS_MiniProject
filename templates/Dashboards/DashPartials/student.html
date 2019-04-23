@@ -1,0 +1,460 @@
+{% extends 'Dashboards/Dash_base.html' %}
+{% load static %}
+
+{% block navDash %}
+<li class="nav-item">
+    <a class="nav-link active" id="btnPg1" href="#Pg1">Universities</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" id="btnPg2" href="#Pg2">My Applications</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" id="btnPg3" href="#Pg3">My Profile</a>
+</li>
+{% endblock %}
+
+{% block pages %}
+<section id="Pg1" class="Pages AppPages container-fluid d-flex justify-content-center">
+
+    <!-- display Universities -->
+    <div class="container-fluid d-flex justify-content-start row mt-3">
+        {% for university in universities %}
+        <div class="card mx-4 uniCard" style="width: 20rem; height: 25rem;">
+            <img src="{{university.photo_main.url}}" class="card-img-top" alt="{{university.title}}">
+            <div class="card-body">
+                <h5 class="card-title Dark-shades-text">{{ university.title }}</h5>
+                <p class="card-text">
+                    <i class="fas fa-map-marked-alt"></i> &nbsp; {{ university.city }}, {{ university.state }} <br>
+                    <i class="fas fa-phone"></i> &nbsp; {{ university.phone_number }} <br>
+                    <i class="fas fa-external-link-alt"></i> &nbsp; <a href="{{university.website}}" target="_blank"> Go
+                        to website </a>
+                </p>
+                <!-- Button trigger modal -->
+                <button type="button" id="btn-UniModal{{university.id}}" class="btn btnUni main-color"
+                    data-toggle="modal" data-target="#UniDetails{{university.id}}">
+                    View Details
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <h1 class="display-4">
+            Sorry!
+            <small>No Universities to display</small>
+        </h1>
+        {% endfor %}
+    </div>
+
+    <!-- Modal for University Details -->
+    {%for university in universities%}
+    <div class="modal fade" id="UniDetails{{university.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="UniInformation" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="UniModalTitle">{{university.title}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {{university.description}}
+
+                    <!-- Tabs for Faculties -->
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            {% if programs %}
+                            {% regroup  programs|dictsort:"department" by university_id as uniPrograms %}
+                            {% for UniProg in uniPrograms %}
+
+                            {% if UniProg.grouper == university.id %}
+                            {% regroup  UniProg.list by department as Programs %}
+                            {% for Prog in Programs %}
+                            <a class="nav-item nav-link nav-faculty" id="nav-{{ Prog.grouper | slugify }}"
+                                data-toggle="tab" href="#nav{{ Prog.grouper | slugify }}" role="tab"
+                                aria-controls="nav{{ Prog.grouper | slugify }}" aria-selected="false">
+                                {{ Prog.grouper }}
+                            </a>
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        {% if programs %}
+                        {% regroup  programs|dictsort:"department" by university_id as uniPrograms %}
+                        {% for UniProg in uniPrograms %}
+
+                        {% if UniProg.grouper == university.id %}
+                        {% regroup  UniProg.list by department as Programs %}
+                        {% for Prog in Programs %}
+                        <div class="tab-pane fade show" id="nav{{ Prog.grouper | slugify }}" role="tabpanel"
+                            aria-labelledby="nav-{{ Prog.grouper | slugify }}">
+                            <div class="accordion mt-2" id="accordionExample">
+                                {% for program in Prog.list %}
+                                <div class="card">
+                                    <div class="card-header" id="heading{{program.id}}">
+                                        <h2 class="mb-0">
+                                            <button class="btn" type="button" data-toggle="collapse"
+                                                data-target="#collapse{{program.id}}" aria-expanded="false"
+                                                aria-controls="collapse{{program.id}}">
+                                                {{program.title}}
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="collapse{{program.id}}" class="collapse"
+                                        aria-labelledby="heading{{program.id}}" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            Duration: {{program.duration}} <br>
+                                            Campuses: {{program.campus}} <br>
+                                            Level of Study: {{program.level}} <br>
+                                            <div class="mt-4">
+                                                <div class="h5" style="font-weight: 800">&nbsp; About this course</div>
+                                                <p>
+                                                    {{program.description}}
+                                                </p>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="h5" style="font-weight: 800">&nbsp; Entry Requirements</div>
+                                                <p>
+                                                    {{program.requirements}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form class="form-inline" action="{% url 'apply' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{university.id}}" name="University">
+                        <div class="form-group">
+                            <label for="selctProgram">Select Program:&nbsp; </label>
+                            <select class="form-control" name="Program" id="selectProgram">
+                                {% if programs %}
+                                {% regroup  programs|dictsort:"department" by university_id as uniPrograms %}
+                                {% for UniProg in uniPrograms %}
+                                {% if UniProg.grouper == university.id %}
+                                {% for prog in UniProg.list %}
+                                <option value="{{prog.id}}">{{prog.title}}</option>
+                                {% endfor %}
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        &nbsp;&nbsp;
+                        <button type="submit" class="btn main-color">Apply</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+
+<!-- Student Application Tracking page -->
+<section id="Pg2" class="Pages AppPages container-fluid d-none justify-content-start">
+    {% if applications %}
+    {% for Application in applications %}
+    <div class="col-4">
+        <div class="card mr-3 mt-3 mb-auto appCard" style="width: 20rem; height: 25.5rem;">
+            <img src="{{Application.university.photo_main.url}}" class="card-img-top"
+                alt="{{Application.university.title}}">
+            <div class="card-body">
+                <h5 class="card-title Dark-shades-text">Application to {{Application.university.title}} for
+                    {{Application.program.title}}</h5>
+                <p class="card-text">
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar {% if Application.is_approved == True %}bg-success{% endif %} text-dark"
+                            role="progressbar" style="width: {{Application.progress}}%;"
+                            aria-valuenow="{{Application.progress}}" aria-valuemin="0" aria-valuemax="100">
+                            PROGRESS: <strong>{{Application.progress}}%</strong>
+                        </div>
+                    </div>
+                </p>
+                <form action="{% url 'deleteApply' %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="Application ID" value="{{Application.id}}">
+                    <button type="submit" id="btn-delete" class="btn btnUni btn-danger float-right">
+                        Cancel Application
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="m-auto">
+        <h1 class="display-5">
+            Sorry!
+            <small>You haven't applied to any Universities yet!</small>
+        </h1>
+    </div>
+    {% endif %}
+
+</section>
+
+<!-- Student Profile Page -->
+<section id="Pg3" class="Pages container-fluid d-none justify-content-center">
+    <div class="row container-fluid justify-content-center">
+        <!-- User general Info -->
+        <div class="col-4 d-flex my-auto" id="GenProfile">
+            <div class="card my-auto">
+                {% if userProfile.profilePic %}
+                <img src="{{userProfile.profilePic.url}}" class="profPic">
+                {% else %}
+                <div class="text-center mt-2">
+                    <i class="userIcon Light-shades-text fas fa-user-circle"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">General Information
+                        <hr>
+                    </h5>
+                    <p class="card-text pb-n5">
+                        <strong>Username: </strong> {{user.username}} <br>
+                        <strong>Name: </strong> {{user.first_name}} {{user.last_name}} <br>
+                        <strong>Email: </strong> {{user.email}} <br>
+                        <strong>Phone Number: </strong> {{stuInformation.phone_number}} <br>
+                        <strong>Date of Birth: </strong> {{stuInformation.DateOfBirth}} <br>
+                        <strong>Gender: </strong> {{stuInformation.gender}} <br>
+                        <strong>Nationality: </strong> {{stuInformation.nationality}} <br>
+                        <strong>NRIC/Passport: </strong> {{stuInformation.nationalID}} <br>
+                        <div class="col-4 mx-n3 mt-n3">
+                            <strong>Address: </strong>
+                        </div>
+                        {{stuInformation.address}}, {{stuInformation.city}}, {{stuInformation.state}},
+                        {{stuInformation.zipcode}}
+                    </p>
+                </div>
+                <div class="card-footer d-flex justify-content-end mt-n2">
+                    <button class="btn main-color" id="btnUpdateProfile">
+                        <i class="icon Dark-shades-text fas fa-user-edit"></i> &nbsp; Update
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User education info -->
+        <div class="col-6 d-flex" id="ProfilePane">
+            <div class="card my-auto" style="width: 60rem;">
+                <div class="card-body pb-n5">
+                    <h5 class="card-title">Education Information
+                        <hr>
+                    </h5>
+                    <p class="card-text">
+                        <strong>Previous School: </strong> {{stuInformation.previousSchool}}
+                        <br>
+                        <strong>Highest Level of Study: </strong> {{stuInformation.highest_level_of_study}}
+                        <br>
+                        <strong>Year of Completion: </strong> {{stuInformation.year_of_completion}}
+                        <br>
+                        <strong> Certificate of study: </strong>
+                        {% if stuInformation.certificate_of_study %}
+                        <br>
+                        <embed src="{{stuInformation.certificate_of_study.url}}" type="application/pdf" width="100%"
+                            height="400px" />
+                        {% endif %}
+                        <br>
+                        <strong> Transcript: </strong>
+                        {% if stuInformation.transcript %}
+                        <br>
+                        <embed src="{{stuInformation.transcript.url}}" type="application/pdf" width="100%"
+                            height="400px" />
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Update form -->
+        <div class="col-6 d-none" id="UpdateProfileFrm">
+            <div class="card my-auto" style="width: 60rem;">
+                <div class="card-body">
+                    <h5 class="card-title">Update Profile
+                        <hr>
+                    </h5>
+                    <form action="{% url 'updateProf' %}" method="POST" enctype="multipart/form-data" style="width: 80%"
+                        class="mx-auto">
+                        {% csrf_token %}
+                        <h5>Update General Information
+                            <hr>
+                        </h5>
+                        {% if userProfile.profilePic %}
+                        <p class='text-info'><i class="fas fa-check"></i> &nbsp; Profile Picture Saved!</p>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="profPic" id="ProfPic">
+                            <label class="custom-file-label">Upload Profile Picture <small>(image.
+                                    'jpg,png,svg,jpeg')</small></label>
+                        </div>
+                        {% else %}
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="profPic" id="ProfPic">
+                            <label class="custom-file-label">Upload Profile Picture <small>(image.
+                                    'jpg,png,svg,jpeg')</small></label>
+                        </div>
+                        {% endif %}
+                        <br class="form-gap">
+                        <div class="form-row">
+                            <label>Date of Birth:</label>
+                            {% if stuInformation.DateOfBirth %}
+                            <input type="date" class="form-control" name="DateOfBirth"
+                                value='{{stuInformation.DateOfBirth|date:"Y m d"|slugify}}'>
+                            {%else%}
+                            <input type="date" class="form-control" name="DateOfBirth">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            <label>Gender:</label>
+                            <div class="form-check form-check-inline">
+                                &nbsp;&nbsp;
+                                {% if stuInformation.gender == 'Male' %}
+                                <input type="radio" name="gender" id="male" class="form-check-input" value="Male"
+                                    checked>
+                                {% else %}
+                                <input type="radio" name="gender" id="male" class="form-check-input" value="Male"
+                                    required>
+                                {% endif %}
+                                <label for="male" class="form-check-label">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                &nbsp;&nbsp;
+                                {% if stuInformation.gender == 'Female' %}
+                                <input type="radio" name="gender" id="female" class="form-check-input" value="Female"
+                                    checked>
+                                {% else %}
+                                <input type="radio" name="gender" id="female" class="form-check-input" value="Female"
+                                    required>
+                                {% endif %}
+                                <label for="female" class="form-check-label">Female</label>
+                            </div>
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.nationality %}
+                            <input type="text" class="form-control" name="nationality"
+                                value="{{stuInformation.nationality}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="nationality" placeholder="Nationality">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.nationalID %}
+                            <input type="text" class="form-control" name="nationalID" placeholder="NRIC/Passport"
+                                value="{{stuInformation.nationalID}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="nationalID" placeholder="NRIC/Passport">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.address %}
+                            <input type="text" class="form-control" name="address" placeholder="Address"
+                                value="{{stuInformation.address}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="address" placeholder="Address">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.city %}
+                            <input type="text" class="form-control" name="city" placeholder="City"
+                                value="{{stuInformation.city}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="city" placeholder="City">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.state %}
+                            <input type="text" class="form-control" name="state" placeholder="State"
+                                value="{{stuInformation.state}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="state" placeholder="State">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.zipcode %}
+                            <input type="text" class="form-control" name="zipcode" placeholder="Zip Code"
+                                value="{{stuInformation.zipcode}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="zipcode" placeholder="Zip Code">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-row">
+                            {% if stuInformation.zipcode %}
+                            <input type="text" class="form-control" name="phone number" placeholder="Phone Number"
+                                value="{{stuInformation.phone_number}}">
+                            {%else%}
+                            <input type="text" class="form-control" name="phone number" placeholder="Phone Number">
+                            {%endif%}
+                        </div>
+                        <br>
+                        <h5>Update Educaton Information
+                            <hr>
+                        </h5>
+                        {% if stuInformation.previousSchool %}
+                        <input type="text" class="form-control" name="previous School" placeholder="Zip Code"
+                            value="{{stuInformation.previousSchool}}">
+                        {%else%}
+                        <input type="text" class="form-control" name="previous School" placeholder="Zip Code">
+                        {%endif%}
+                        <br class="form-gap">
+                        <div class="form-row">
+                            <label>Year of Completion:</label>
+                            {% if stuInformation.year_of_completion %}
+                            <input type="date" class="form-control" name="Year of Completion"
+                                value='{{stuInformation.year_of_completion|date:"Y m d"|slugify}}'>
+                            {%else%}
+                            <input type="date" class="form-control" name="Year of Completion">
+                            {%endif%}
+                        </div>
+                        <br class="form-gap">
+                        <div class="form-group">
+                            <label for="exampleFormControlSelect1">Level of Study:</label>
+                            <select class="form-control" name="Level of Study">
+                                <option {% if stuInformation.highest_level_of_study == "O-level/SPM" %} selected
+                                    {% endif %} value="O-level/SPM">O-level/SPM</option>
+                                <option {% if stuInformation.highest_level_of_study == "A-level/STPM" %} selected
+                                    {% endif %} value="A-level/STPM">A-level/STPM</option>
+                                <option {% if stuInformation.highest_level_of_study == "Pre-University" %} selected
+                                    {% endif %} value="Pre-University">Pre-University</option>
+                                <option {% if stuInformation.highest_level_of_study == "Undergraduate" %} selected
+                                    {% endif %} value="Undergraduate">Undergraduate</option>
+                                <option {% if stuInformation.highest_level_of_study == "Postgraduate" %} selected
+                                    {% endif %} value="Postgraduate">Postgraduate</option>
+                            </select>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="certificate_of_study" id="Cert">
+                            <label class="custom-file-label">Upload Certicate of Study <small>(file.pdf)</small></label>
+                        </div>
+                        <br class="form-gap">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="transcript" id="Transcript">
+                            <label class="custom-file-label">Upload Transcript <small>(file.pdf)</small></label>
+                        </div>
+                        <br><br>
+                        <button class="btn main-color" type="submit" style="float: right;" id="btnSave">
+                            <i class="icon Dark-shades-text fas fa-save"></i> &nbsp; Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

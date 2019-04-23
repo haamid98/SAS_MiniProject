@@ -1,0 +1,208 @@
+{% extends 'Dashboards/Dash_base.html' %}
+{% load static %}
+
+{% block navDash %}
+<li class="nav-item">
+    <a class="nav-link active" id="btnPg1" href="#Pg1">View Applications</a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" id="btnPg2" href="#Pg2">Add Programs</a>
+</li>
+<!-- <li class="nav-item">
+    <a class="nav-link" id="btnPg3" href="#Pg3">My Profile</a>
+</li> -->
+{% endblock %}
+
+{% block pages %}
+
+<section id="Pg1" class="Pages AppPages AppPages container-fluid d-flex justify-content-start">
+
+    {% if applications %}
+    {% for Application in applications %}
+    <div class="col-4">
+        <div class="card mt-3 mb-auto appCard" style="width: 22rem; height: 27rem;">
+            <img src="{{Application.university.photo_main.url}}" class="card-img-top"
+                alt="{{Application.university.title}}">
+            <div class="card-body">
+                <h5 class="card-title Dark-shades-text">{{Application.user.first_name}}'s Application for
+                    {{Application.program.title}}</h5>
+                <p class="card-text">
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar {% if Application.is_approved == True %}bg-success{% endif %} text-dark"
+                            role="progressbar" style="width: {{Application.progress}}%;"
+                            aria-valuenow="{{Application.progress}}" aria-valuemin="0" aria-valuemax="100">
+                            PROGRESS: <strong>{{Application.progress}}%</strong>
+                        </div>
+                    </div>
+                </p>
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary float-right" data-toggle="modal"
+                    data-target="#StuInfo{{Application.user.id}}">
+                    View Application details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="StuInfo{{Application.user.id}}" tabindex="-1" role="dialog"
+        aria-labelledby="StuInfoTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="StuInfoTitle">{{ Application.user.first_name }}'s Application for
+                        {{ Application.program.title }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body mx-auto w-75">
+                    <form action="{% url 'updateProg' %}" method="POST">
+                        {% csrf_token %}
+                        <!-- hidden input to identify application in DB! -->
+                        <input type="hidden" name="Application ID" value="{{Application.id}}">
+
+                        <h5>Student Information</h5>
+                        <hr>
+                        <p>
+                            <strong>Full Name: </strong>
+                            {{Application.user.first_name}}&nbsp;{{Application.user.last_name}} <br>
+                            <strong>Date of Birth: </strong> {{Application.studentInfo.DateOfBirth}} <br>
+                            <strong>Gender: </strong> {{Application.studentInfo.gender}} <br>
+                            <strong>Email: </strong> {{Application.user.email}} <br>
+                            <strong>Phone Number: </strong> {{Application.studentInfo.phone_number}} <br>
+                            <strong>Nationality: </strong> {{Application.studentInfo.nationality}} <br>
+                            <strong>NRIC/Passport: </strong> {{Application.studentInfo.nationalID}} <br>
+                            <div class="col-4 mx-n3 mt-n3">
+                                <strong>Address: </strong>
+                            </div>
+                            {{Application.studentInfo.address}}, {{Application.studentInfo.city}},
+                            {{Application.studentInfo.state}},
+                            {{Application.studentInfo.zipcode}} <br>
+                        </p>
+
+                        <h5>Education Information</h5>
+                        <p>
+                            <strong>Previous School: </strong> {{Application.studentInfo.previousSchool}} <br>
+                            <strong>Highest Level of Study: </strong> {{Application.studentInfo.highest_level_of_study}}
+                            <br>
+                            <strong> Certificate of study: </strong>
+                            {% if Application.studentInfo.certificate_of_study %}
+                            <br>
+                            <embed src="{{Application.studentInfo.certificate_of_study.url}}" type="application/pdf"
+                                width="80%" height="620px" style="overflow: hidden" />
+                            {% endif %}
+                            <br>
+                            <strong> Transcript: </strong>
+                            {% if Application.studentInfo.transcript %}
+                            <br>
+                            <embed src="{{Application.studentInfo.transcript.url}}" type="application/pdf" width="80%"
+                                height="620px" style="overflow: hidden" />
+                            {% endif %}
+                        </p>
+
+                        <select {% if Application.is_approved %} disabled {% endif %} class="form-control"
+                            name="Progress">
+                            <option {% if Application.progress == 20 %} selected {% endif %} value="20">Under
+                                Perliminary Review</option>
+                            <option {% if Application.progress == 40 %} selected {% endif %} value="40">Reviewing
+                                Education Qualifications</option>
+                            <option {% if Application.progress == 60 %} selected {% endif %} value="60">Awaiting Student
+                                Essay</option>
+                            <option {% if Application.progress == 80 %} selected {% endif %} value="80">Awaiting
+                                Approval</option>
+                            <option {% if Application.progress == 100 %} selected {% endif %} value="100">Approved
+                            </option>
+                        </select>
+                        <br>
+                        <div class="from-check ml-4" style="font-size: 1.2rem;">
+                            <input type="checkbox" class="form-check-input" name="is_Approved" value="True"
+                                id="approved" {% if Application.is_approved %} checked {% endif %}>
+                            <label for="approved">Student Application Approved</label>
+                        </div>
+                        <br class="form-gap">
+                        <button type="submit" id="btn-delete" class="btn btnUni btn-success float-right">
+                            Update Progress
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <div class="m-auto">
+        <h1 class="display-5">
+            Sorry!
+            <small>There are no Application yet!</small>
+        </h1>
+    </div>
+    {% endif %}
+
+</section>
+
+<section id="Pg2" class="Pages AppPages container-fluid d-none justify-content-start">
+    {% if programs %}
+    {% for program in programs %}
+    <div class="col-11 my-auto">
+        <div class="card" style="width: 70rem; height: 40rem; overflow: hidden">
+            <div class="card-header">
+                <h5 class="card-title">{{program.title}}</h5>
+            </div>
+            <div class="card-body">
+                <p>
+                    <strong>Department: </strong> {{program.department}} <br>
+                    <strong>Level: </strong> {{program.level}} <br>
+                    <strong>Duration: </strong> {{program.duration}} <br>
+                    <strong>Campus: </strong> {{program.campus}} <br><br>
+                    <strong>Requirements: </strong> <br> {{program.requirements}} <br><br>
+                    <strong>Description: </strong> <br> {{program.description}} <br>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn main-color" id="btnAdd" data-toggle="modal" data-target="#addProg">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addProg" tabindex="-1" role="dialog" aria-labelledby="addProg" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProgLabel">Add a new program</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{% url 'addProg' %}" method="POST" id="addProg">
+                        {% csrf_token %}
+                        <input type="hidden" name="university" value="{{userProfile.university}}">
+                        <input type="text" name="title" placeholder="Program Title" class="form-control">
+                        <br class="form-gap">
+                        <input type="text" name="department" placeholder="Department" class="form-control">
+                        <br class="form-gap">
+                        <input type="text" name="level" placeholder="Level" class="form-control">
+                        <br class="form-gap">
+                        <input type="number" min="1" max="10" step="1" name="duration" placeholder="Duration" class="form-control">
+                        <br class="form-gap">
+                        <input type="text" name="campus" placeholder="Campus" class="form-control">
+                        <br class="form-gap">
+                        <textarea type="textare" name="requirements" placeholder="Requirements" class="form-control"></textarea>
+                        <br class="form-gap">
+                        <textarea row=20 name="description" placeholder="Description" class="form-control"></textarea>
+                        <br class="form-gap">
+                        <button type="submit" class="btn btn-success float-right">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

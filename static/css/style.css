@@ -1,0 +1,255 @@
+/*
+FONTS
+font-family: 'Source Sans Pro', sans-serif;
+font-family: 'Open Sans', sans-serif;
+font-family: 'Lato', sans-serif;
+font-family: 'Titillium Web', sans-serif;
+*/
+
+.main-color {
+    background-color: #2892D7 !important;
+}
+
+.main-color-text {
+    color: #2892D7 !important;
+}
+
+.Dark-accent {
+    background-color: #ED6A5A !important;
+}
+
+.Dark-accent-text {
+    color: #ED6A5A !important;
+}
+
+.Light-accent {
+    background-color: #DB995A !important;
+}
+
+.Light-accent-text {
+    color: #DB995A !important;
+}
+
+.Dark-shades {
+    background-color: #2C4251 !important;
+}
+
+.Dark-shades-text {
+    color: #2C4251 !important;
+}
+
+.Light-shades {
+    background-color: #C1C1C1 !important;
+}
+
+.Light-shades-text {
+    color: #C1C1C1 !important;
+}
+
+.card.signup-card {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    border-radius: 15px;
+}
+
+.sticky {
+    position: fixed !important;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+}
+
+.landing-text {
+    position: relative;
+    width: 35rem;
+}
+
+.landing-paintTop {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(193, 193, 193, 0.5);
+    position: absolute;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+br.form-gap {
+    content: "";
+    display: block;
+    margin-bottom: 0.4em;
+}
+
+body {
+    font-family: 'Titillium Web', sans-serif !important;
+}
+
+#landing-frame {
+    background: #212121;
+    height: 100%;
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+#landing-bg {
+    background: #2c4251 url("../img/students_lecture_hall.jpg") bottom left no-repeat;
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+}
+
+#landing-caption {
+    width: 100%;
+    position: relative;
+}
+
+/* User Testimonials */
+h2 {
+    color: #333;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    position: relative;
+    margin: 25px 0 50px;
+}
+
+h2::after {
+    content: "";
+    width: 100px;
+    position: absolute;
+    margin: 0 auto;
+    height: 3px;
+    background: #ffdc12;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+}
+
+.carousel {
+    width: 650px;
+    margin: 0 auto;
+    padding-bottom: 50px;
+}
+
+.carousel .item {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    min-height: 340px;
+}
+
+.carousel .item a {
+    color: #eb7245;
+}
+
+.carousel .img-box {
+    width: 145px;
+    height: 145px;
+    margin: 0 auto;
+    border-radius: 50%;
+}
+
+.carousel .img-box img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 50%;
+}
+
+.carousel .testimonial {
+    padding: 30px 0 10px;
+}
+
+.carousel .overview {
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.carousel .overview b {
+    color: #333;
+    font-size: 15px;
+    text-transform: uppercase;
+    display: block;
+    padding-bottom: 5px;
+}
+
+.carousel .star-rating i {
+    font-size: 18px;
+    color: #ffdc12;
+}
+
+.carousel .carousel-control {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #999;
+    text-shadow: none;
+    top: 4px;
+}
+
+.carousel-control i {
+    font-size: 20px;
+    margin-right: 2px;
+}
+
+.carousel-control.left {
+    left: auto;
+    right: 40px;
+}
+
+.carousel-control.right i {
+    margin-right: -2px;
+}
+
+.carousel .carousel-indicators {
+    bottom: 15px;
+}
+
+.carousel-indicators li,
+.carousel-indicators li.active {
+    width: 11px;
+    height: 11px;
+    margin: 1px 5px;
+    border-radius: 50%;
+}
+
+.carousel-indicators li {
+    background: #e2e2e2;
+    border-color: transparent;
+}
+
+.carousel-indicators li.active {
+    border: none;
+    background: #888;
+}
+
+@media screen and (max-width: 429px) {
+
+    html,
+    body {
+        font-size: 0.6em !important;
+    }
+
+    .card.signup-card {
+        margin: auto;
+    }
+
+    .container-fluid {
+        width: auto !important;
+    }
+}
+
+@media screen and (max-width: 768px) and (min-width: 430px) {
+
+    html,
+    body {
+        font-size: 0.8em !important;
+    }
+}
